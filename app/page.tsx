@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {client} from '@/sanity/client'
 import {urlFor} from '@/sanity/image'
 
@@ -23,7 +24,11 @@ export default async function Home() {
 
       <div className="space-y-10">
         {posts.map((post: any) => (
-          <article key={post.slug?.current} className="flex gap-6 items-start">
+          <Link
+            key={post.slug?.current}
+            href={`/bai-viet/${post.slug?.current}`}
+            className="flex gap-6 items-start hover:opacity-80 transition"
+          >
             {post.coverImage && (
               <img
                 src={urlFor(post.coverImage).width(240).height(160).url()}
@@ -38,7 +43,7 @@ export default async function Home() {
               <h2 className="text-xl font-semibold text-gray-900 mt-1">{post.title}</h2>
               <p className="text-sm text-gray-500 mt-1">bởi {post.authorName}</p>
             </div>
-          </article>
+          </Link>
         ))}
       </div>
     </main>
