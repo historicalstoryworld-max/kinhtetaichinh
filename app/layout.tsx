@@ -16,6 +16,11 @@ export const metadata: Metadata = {
 async function getCategories() {
   return client.fetch(`*[_type == "category"]{title, "slug": slug.current} | order(title asc)`)
 }
+async function getTickerPosts() {
+  return client.fetch(
+    `*[_type == "post"] | order(publishedAt desc)[0...8]{title, slug}`
+  )
+}
 
 async function getAuthor() {
   return client.fetch(`*[_type == "author"][0]{name, bio}`)
@@ -37,6 +42,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const categories = await getCategories()
+  const tickerPosts = await getTickerPosts()
   const author = await getAuthor()
   const recentPosts = await getRecentPosts()
   const galleryDocs = await getGalleryImages()
@@ -44,11 +50,11 @@ export default async function RootLayout({
 
   return (
     <html lang="vi">
-      <body className={fraunces.variable + ' ' + inter.variable + ' font-sans bg-[#F6F3ED] text-[#1E2430]'}>
-        <nav className="bg-[#1B2A4A] text-white">
+      <body className={fraunces.variable + ' ' + inter.variable + ' font-sans bg-white text-[#1E2430]'}>
+        <nav className="bg-[#EAF4FB] border-b border-[#D6E9F8]">
           <div className="max-w-5xl mx-auto px-6 py-5 flex items-center gap-8">
-            <Link href="/" className="font-serif text-xl font-semibold">
-              Kinh tế <span className="text-[#E7D2A5]">tài chính</span>
+            <Link href="/" className="font-serif text-xl font-semibold text-[#0F3D66]">
+              Kinh tế <span className="text-[#2F7FE0]">tài chính</span>
             </Link>
             <div className="flex gap-5">
               {categories.map((cat: any) =>
@@ -56,7 +62,7 @@ export default async function RootLayout({
                   <Link
                     key={cat.slug}
                     href={`/chuyen-muc/${cat.slug}`}
-                    className="text-sm opacity-80 hover:opacity-100"
+                    className="text-sm text-[#0F3D66] opacity-80 hover:opacity-100"
                   >
                     {cat.title}
                   </Link>
@@ -64,11 +70,24 @@ export default async function RootLayout({
               )}
             </div>
           </div>
+        <div className="bg-[#2F7FE0] text-white overflow-hidden whitespace-nowrap py-2">
+          <div className="inline-flex animate-marquee">
+            {[...tickerPosts, ...tickerPosts].map((post: any, i: number) => (
+              <Link
+                key={i}
+                href={`/bai-viet/${post.slug?.current}`}
+                className="text-sm px-6 border-r border-white/30 hover:underline"
+              >
+                {post.title}
+              </Link>
+            ))}
+          </div>
+        </div>
         </nav>
 
         {children}
 
-        <footer className="bg-[#1B2A4A] text-white mt-16">
+        <footer className="bg-[#0F3D66] text-white mt-16">
           <div className="max-w-5xl mx-auto px-6 py-14 grid md:grid-cols-3 gap-12">
             <div>
               <h4 className="font-serif font-semibold mb-4 pb-2 border-b border-white/20">
