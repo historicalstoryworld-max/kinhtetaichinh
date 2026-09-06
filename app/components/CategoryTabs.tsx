@@ -2,6 +2,7 @@
 
 import {useState} from 'react'
 import Link from 'next/link'
+import {urlFor} from '@/sanity/image'
 
 type Post = {
   title: string
@@ -13,11 +14,9 @@ type Post = {
 export default function CategoryTabs({
   categories,
   posts,
-  urlFor,
 }: {
   categories: {title: string; slug: string}[]
   posts: Post[]
-  urlFor: (source: any) => any
 }) {
   const [active, setActive] = useState(categories[0]?.title || '')
 

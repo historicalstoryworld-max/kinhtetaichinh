@@ -86,7 +86,7 @@ export default async function Home() {
         </section>
       )}
 
-      <CategoryTabs categories={categories} posts={posts} urlFor={urlFor} />
+            <CategoryTabs categories={categories} posts={posts} />
 
       <section className="max-w-5xl mx-auto px-6 py-10 border-t border-[#EAF4FB]">
         <h2 className="font-serif text-xl font-semibold text-[#0F3D66] mb-6">
