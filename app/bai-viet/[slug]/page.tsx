@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {client} from '@/sanity/client'
 import {urlFor} from '@/sanity/image'
 import {PortableText} from '@portabletext/react'
@@ -12,6 +13,7 @@ async function getPost(slug: string) {
       slideFile,
       gallery,
       "categoryTitle": category->title,
+      "categorySlug": category->slug.current,
       "authorName": author->name
     }`,
     {slug}
@@ -32,36 +34,49 @@ export default async function PostPage({
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-16">
-      <span className="text-xs uppercase tracking-wide text-blue-600 font-medium">
-        {post.categoryTitle}
-      </span>
-      <h1 className="text-3xl font-semibold text-gray-900 mt-2">{post.title}</h1>
-      <p className="text-sm text-gray-500 mt-2 mb-8">bởi {post.authorName}</p>
+      <Link href="/" className="text-sm text-[#2F6B62] hover:underline">
+        ← Về trang chủ
+      </Link>
+
+      <div className="mt-6">
+        {post.categorySlug ? (
+          <Link
+            href={`/chuyen-muc/${post.categorySlug}`}
+            className="text-xs text-[#2F6B62] border-b border-[#2F6B62] pb-0.5"
+          >
+            {post.categoryTitle}
+          </Link>
+        ) : (
+          <span className="text-xs text-[#2F6B62]">{post.categoryTitle}</span>
+        )}
+        <h1 className="font-serif text-3xl font-medium text-gray-900 mt-3">{post.title}</h1>
+        <p className="text-sm text-gray-500 mt-2 mb-8">bởi {post.authorName}</p>
+      </div>
 
       {post.coverImage && (
         <img
           src={urlFor(post.coverImage).width(800).height(450).url()}
           alt={post.title}
-          className="w-full rounded-md mb-8"
+          className="w-full mb-8"
         />
       )}
 
       {post.videoUrl && (
         <div className="mb-8 aspect-video">
           <iframe
-            className="w-full h-full rounded-md"
+            className="w-full h-full"
             src={post.videoUrl.replace('watch?v=', 'embed/')}
             allowFullScreen
           />
         </div>
       )}
 
-      <div className="prose prose-gray max-w-none mb-8">
+      <div className="prose prose-gray max-w-none mb-8 font-sans">
         <PortableText value={post.body} />
       </div>
 
-           {post.slideFile?.asset && (
-        <a href={'https://cdn.sanity.io/files/l2dw01h9/production/' + post.slideFile.asset._ref.replace('file-', '').replace('-pdf', '.pdf')} target="_blank" className="inline-block mb-8 text-blue-600 underline">
+      {post.slideFile?.asset && (
+        <a href={'https://cdn.sanity.io/files/l2dw01h9/production/' + post.slideFile.asset._ref.replace('file-', '').replace('-pdf', '.pdf')} target="_blank" className="inline-block mb-8 text-[#2F6B62] underline">
           Xem slide đính kèm
         </a>
       )}
@@ -73,7 +88,7 @@ export default async function PostPage({
               key={i}
               src={urlFor(img).width(300).height(300).url()}
               alt=""
-              className="w-full h-40 object-cover rounded-md"
+              className="w-full h-40 object-cover"
             />
           ))}
         </div>
