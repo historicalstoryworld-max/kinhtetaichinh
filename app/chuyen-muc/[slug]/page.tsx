@@ -2,21 +2,32 @@ import Link from 'next/link'
 import {client} from '@/sanity/client'
 import {urlFor} from '@/sanity/image'
 
-async function getPosts() {
-  return client.fetch(`*[_type == "post"] | order(publishedAt desc){
-    title,
-    slug,
-    coverImage,
-    "categoryTitle": category->title,
-    "authorName": author->name
-  }`)
+async function getCategoryPosts(slug: string) {
+  return client.fetch(
+    `*[_type == "post" && category->slug.current == $slug] | order(publishedAt desc){
+      title,
+      slug,
+      coverImage,
+      "categoryTitle": category->title,
+      "authorName": author->name
+    }`,
+    {slug}
+  )
 }
 
-export default async function Home() {
-  const posts = await getPosts()
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{slug: string}>
+}) {
+  const {slug} = await params
+  const posts = await getCategoryPosts(slug)
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-16">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-8">
+        {posts[0]?.categoryTitle || 'Chuyên mục'}
+      </h1>
       <div className="space-y-10">
         {posts.map((post: any) => (
           <Link
@@ -32,9 +43,6 @@ export default async function Home() {
               />
             )}
             <div>
-              <span className="text-xs uppercase tracking-wide text-blue-600 font-medium">
-                {post.categoryTitle}
-              </span>
               <h2 className="text-xl font-semibold text-gray-900 mt-1">{post.title}</h2>
               <p className="text-sm text-gray-500 mt-1">bởi {post.authorName}</p>
             </div>
