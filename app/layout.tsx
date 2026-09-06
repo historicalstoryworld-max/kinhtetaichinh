@@ -16,20 +16,9 @@ export const metadata: Metadata = {
 async function getCategories() {
   return client.fetch(`*[_type == "category"]{title, "slug": slug.current} | order(title asc)`)
 }
-async function getTickerPosts() {
-  return client.fetch(
-    `*[_type == "post"] | order(publishedAt desc)[0...8]{title, slug}`
-  )
-}
 
 async function getAuthor() {
   return client.fetch(`*[_type == "author"][0]{name, bio}`)
-}
-
-async function getRecentPosts() {
-  return client.fetch(
-    `*[_type == "post"] | order(publishedAt desc)[0...3]{title, slug, coverImage, "authorName": author->name}`
-  )
 }
 
 async function getGalleryImages() {
@@ -42,53 +31,58 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const categories = await getCategories()
-  const tickerPosts = await getTickerPosts()
   const author = await getAuthor()
-  const recentPosts = await getRecentPosts()
   const galleryDocs = await getGalleryImages()
   const galleryImages = galleryDocs.flatMap((d: any) => d.gallery || []).slice(0, 4)
+
+  const today = new Date().toLocaleDateString('vi-VN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
   return (
     <html lang="vi">
       <body className={fraunces.variable + ' ' + inter.variable + ' font-sans bg-white text-[#1E2430]'}>
-        <nav className="bg-[#EAF4FB] border-b border-[#D6E9F8]">
-          <div className="max-w-5xl mx-auto px-6 py-5 flex items-center gap-8">
-            <Link href="/" className="font-serif text-xl font-semibold text-[#0F3D66]">
-              Kinh tế <span className="text-[#2F7FE0]">tài chính</span>
-            </Link>
-            <div className="flex gap-5">
-              {categories.map((cat: any) =>
-                cat.slug ? (
-                  <Link
-                    key={cat.slug}
-                    href={`/chuyen-muc/${cat.slug}`}
-                    className="text-sm text-[#0F3D66] opacity-80 hover:opacity-100"
-                  >
-                    {cat.title}
-                  </Link>
-                ) : null
-              )}
-            </div>
-          </div>
-        <div className="bg-[#2F7FE0] text-white overflow-hidden whitespace-nowrap py-2">
-          <div className="inline-flex animate-marquee">
-            {[...tickerPosts, ...tickerPosts].map((post: any, i: number) => (
-              <Link
-                key={i}
-                href={`/bai-viet/${post.slug?.current}`}
-                className="text-sm px-6 border-r border-white/30 hover:underline"
-              >
-                {post.title}
-              </Link>
-            ))}
+        <div className="max-w-5xl mx-auto px-6 pt-4">
+          <span className="text-xs text-gray-400">{today}</span>
+        </div>
+
+        <div className="text-center pt-4 pb-6">
+          <Link href="/">
+            <h1 className="font-serif text-4xl md:text-5xl font-bold uppercase tracking-wide text-[#0F3D66]">
+              Kinh tế tài chính
+            </h1>
+          </Link>
+          <p className="text-sm text-gray-500 mt-2">
+            Kinh tế - Tài chính - Bảo hiểm: Không khó như bạn nghĩ
+          </p>
+        </div>
+
+        <div className="bg-[#0F3D66] text-white">
+          <div className="max-w-5xl mx-auto px-6 py-2.5 flex items-center justify-center gap-5 overflow-x-auto">
+                        <span className="flex-shrink-0 text-xs font-semibold bg-[#E2483B] px-3 py-1 rounded">
+              TOP TOPICS
+            </span>
+            {categories.map((cat: any) =>
+              cat.slug ? (
+                <Link
+                  key={cat.slug}
+                  href={`/chuyen-muc/${cat.slug}`}
+                  className="flex-shrink-0 text-sm opacity-85 hover:opacity-100 whitespace-nowrap"
+                >
+                  {cat.title}
+                </Link>
+              ) : null
+            )}
           </div>
         </div>
-        </nav>
 
         {children}
 
         <footer className="bg-[#0F3D66] text-white mt-16">
-          <div className="max-w-5xl mx-auto px-6 py-14 grid md:grid-cols-3 gap-12">
+          <div className="max-w-5xl mx-auto px-6 py-14 grid md:grid-cols-2 gap-12">
             <div>
               <h4 className="font-serif font-semibold mb-4 pb-2 border-b border-white/20">
                 Giới thiệu
@@ -97,31 +91,6 @@ export default async function RootLayout({
                 {author?.bio ||
                   'Kinh tế tài chính là nơi ghi lại những bài học về tiền bạc — viết đơn giản, cho người mới bắt đầu.'}
               </p>
-            </div>
-
-            <div>
-              <h4 className="font-serif font-semibold mb-4 pb-2 border-b border-white/20">
-                Bài viết gần đây
-              </h4>
-              {recentPosts.map((post: any) => (
-                <Link
-                  key={post.slug?.current}
-                  href={`/bai-viet/${post.slug?.current}`}
-                  className="flex gap-3 py-3 border-b border-white/10 last:border-none"
-                >
-                  {post.coverImage && (
-                    <img
-                      src={urlFor(post.coverImage).width(112).height(112).url()}
-                      alt=""
-                      className="w-14 h-14 object-cover flex-shrink-0"
-                    />
-                  )}
-                  <div>
-                    <h5 className="text-sm font-medium leading-tight">{post.title}</h5>
-                    <span className="text-xs opacity-60">{post.authorName}</span>
-                  </div>
-                </Link>
-              ))}
             </div>
 
             <div>

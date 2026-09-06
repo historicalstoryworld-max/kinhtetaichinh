@@ -1,14 +1,14 @@
 'use client'
 
 import {useState} from 'react'
-import Link from 'next/link'
-import {urlFor} from '@/sanity/image'
+import PostCard from './PostCard'
 
 type Post = {
   title: string
   slug: {current: string}
   coverImage: any
   categoryTitle: string
+  authorName?: string
 }
 
 export default function CategoryTabs({
@@ -23,8 +23,8 @@ export default function CategoryTabs({
   const filtered = posts.filter((p) => p.categoryTitle === active)
 
   return (
-    <section className="max-w-5xl mx-auto px-6 py-10 border-t border-[#EAF4FB]">
-      <div className="flex items-center justify-between mb-6">
+    <section className="border-t border-[#EAF4FB] pt-10">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <h2 className="font-serif text-xl font-semibold text-[#0F3D66]">
           Quanh bạn nên biết
         </h2>
@@ -50,20 +50,9 @@ export default function CategoryTabs({
         <p className="text-sm text-gray-400">Chưa có bài viết nào trong chuyên mục này.</p>
       )}
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid sm:grid-cols-2 gap-6">
         {filtered.map((post) => (
-          <Link key={post.slug?.current} href={`/bai-viet/${post.slug?.current}`} className="block group">
-            {post.coverImage && (
-              <img
-                src={urlFor(post.coverImage).width(300).height(180).url()}
-                alt={post.title}
-                className="w-full h-36 object-cover"
-              />
-            )}
-            <h3 className="font-serif text-base font-medium mt-2 group-hover:underline">
-              {post.title}
-            </h3>
-          </Link>
+          <PostCard key={post.slug?.current} post={post} />
         ))}
       </div>
     </section>
